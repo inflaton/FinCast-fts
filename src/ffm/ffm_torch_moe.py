@@ -76,14 +76,22 @@ class FFmTorch(ffm_base.FFmBase):
         elif new_k.startswith('module.'):
             new_k = new_k[len('module.'):]
         new_state_dict[new_k] = v
-      
-      logging.info("Loading checkpoint from %s, strict = True", checkpoint)
-      self._model.load_state_dict(new_state_dict, strict=True)
+
+      logging.info("Loading checkpoint from %s, strict = False", checkpoint)
+      missing_keys, unexpected_keys = self._model.load_state_dict(new_state_dict, strict=False)
+      if missing_keys:
+          logging.warning("Missing keys when loading checkpoint: %s", missing_keys[:10])  # Show first 10
+      if unexpected_keys:
+          logging.warning("Unexpected keys when loading checkpoint: %s", unexpected_keys[:10])  # Show first 10
 
     else: #normal loading
       loaded_checkpoint = torch.load(checkpoint, weights_only=True)
-      logging.info("Loading checkpoint from %s, strict = True", checkpoint)
-      self._model.load_state_dict(loaded_checkpoint, strict=True)
+      logging.info("Loading checkpoint from %s, strict = False", checkpoint)
+      missing_keys, unexpected_keys = self._model.load_state_dict(loaded_checkpoint, strict=False)
+      if missing_keys:
+          logging.warning("Missing keys when loading checkpoint: %s", missing_keys[:10])  # Show first 10
+      if unexpected_keys:
+          logging.warning("Unexpected keys when loading checkpoint: %s", unexpected_keys[:10])  # Show first 10
 
     logging.info("Sending checkpoint to device %s", f"{self._device}")
     self._model.to(self._device)

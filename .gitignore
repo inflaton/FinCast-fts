@@ -12,3 +12,4 @@ logs/
 src/my_project.egg-info/
 results/long_horizon
 results/
+model_weights
